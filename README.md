@@ -2,7 +2,7 @@
 
 Small **FastAPI + Postgres/PostGIS** service that:
 
-- lets a customer **upload a road network** (GeoJSON *LineStrings*)
+- lets a customer **upload a road network** (GeoJSON _LineStrings_)
 - **versions** it on every update (no deletes; old version is closed with `valid_to`)
 - serves **edges as GeoJSON**, including **time-travel** via `?datetime=...`
 - Auth is by **`X-API-Key`** header
@@ -34,16 +34,20 @@ Open docs: **http://localhost:8000/docs**
 
 > All requests need: `-H 'X-API-Key: dev-123'`
 
-### Task 1 — Create a network (first upload)  
+### Task 1 — Create a network (first upload)
+
 **POST** `/networks`
+
 ```bash
 curl -s -H 'X-API-Key: dev-123'   -F name='Network 1'   -F file=@ingest_bundle/file-1.geojson   http://localhost:8000/networks | jq .
 ```
 
 ---
 
-### Task 2 — Update a network (new version)  
+### Task 2 — Update a network (new version)
+
 **POST** `/networks/update`
+
 ```bash
 curl -s -H 'X-API-Key: dev-123'   -F name='Network 1'   -F file=@ingest_bundle/file-2.geojson   http://localhost:8000/networks/update | jq .
 ```
@@ -53,7 +57,8 @@ Older edges remain, but are no longer “current”.
 
 ---
 
-### Task 3 — Get edges as GeoJSON (with time-travel)  
+### Task 3 — Get edges as GeoJSON (with time-travel)
+
 **GET** `/networks/{network_id}/edges?datetime=2025-09-06T05:10:00Z`
 
 - `datetime` is **optional**. If omitted, “now” (UTC) is used.

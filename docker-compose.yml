@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: roads
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d roads"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data # <<< persist data here
+
+  api:
+    build: .
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: ["8000:8000"]
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/app
+    volumes:
+      - ./:/app
+volumes:
+  pgdata: {}
